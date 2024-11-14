@@ -1074,6 +1074,7 @@ drawbar(Monitor *m)
             }
             drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
             x += tabw;
+            w = tabw;
             c->taskw = w;
             tasks_w += w;
         }
