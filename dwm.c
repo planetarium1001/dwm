@@ -1046,37 +1046,39 @@ drawbar(Monitor *m)
     drw_setscheme(drw, scheme[SchemeNorm]);
     x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
-    // 绘制TASKS
-    for (c = m->clients; c; c = c->next) {
-        // 判断是否需要绘制 && 判断颜色设置
-        if (!ISVISIBLE(c))
-            continue;
-        if (m->sel == c)
-            scm = SchemeSel;
-        else if (HIDDEN(c))
-            scm = SchemeHid;
-        else
-            scm = SchemeNorm;
-        drw_setscheme(drw, scheme[scm]);
+    // 绘制TASK
+    /** 空白部分的宽度 = 总宽度 - 状态栏的宽度 - 托盘的宽度 - sp (托盘存在时 额外多-一个 systrayspadding) */
+    empty_w = m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
+    if (n > 0) {
+        int remainder = empty_w % n;
+        int tabw = (1.0 / (double)n) * empty_w + 1;
 
-        // 绘制TASK
-        w = MIN(TEXTW(c->name), TEXTW("          "));
-        empty_w = m->ww - x - status_w - system_w;
-        if (w > empty_w) { // 如果当前TASK绘制后长度超过最大宽度
-            w = empty_w;
-            x = drw_text(drw, x, 0, w, bh, lrpad / 2, "...", 0);
-            c->taskw = w;
-            tasks_w += w;
-            break;
-        } else {
-            x = drw_text(drw, x, 0, w, bh, lrpad / 2, c->name, 0);
+        // 绘制TASKS
+        for (c = m->clients; c; c = c->next) {
+            // 判断是否需要绘制 && 判断颜色设置
+            if (!ISVISIBLE(c))
+                continue;
+            if (m->sel == c)
+                scm = SchemeSel;
+            else if (HIDDEN(c))
+                scm = SchemeHid;
+            else
+                scm = SchemeNorm;
+            drw_setscheme(drw, scheme[scm]);
+
+            if (remainder >= 0) {
+                if (remainder == 0) {
+                    tabw--;
+                }
+					remainder--;
+            }
+            drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
+            x += tabw;
             c->taskw = w;
             tasks_w += w;
         }
     }
-    /** 空白部分的宽度 = 总宽度 - 状态栏的宽度 - 托盘的宽度 - sp (托盘存在时 额外多-一个 systrayspadding) */
-    empty_w = m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
-    if (empty_w > 0) {
+    else {
         drw_setscheme(drw, scheme[SchemeBarEmpty]);
         drw_rect(drw, x, 0, empty_w, bh, 1, 1);
     }
