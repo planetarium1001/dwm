@@ -1046,6 +1046,8 @@ drawbar(Monitor *m)
     drw_setscheme(drw, scheme[SchemeNorm]);
     x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
+
+    
     // 绘制TASK
     /** 空白部分的宽度 = 总宽度 - 状态栏的宽度 - 托盘的宽度 - sp (托盘存在时 额外多-一个 systrayspadding) */
     empty_w = m->ww - x - status_w - system_w - 2 * sp - (system_w ? systrayspadding : 0);
@@ -1602,7 +1604,6 @@ showonlyorall(const Arg *arg) {
     } else
         hideotherwins(&(Arg) { .v = selmon->sel });
 }
-
 
 void
 incnmaster(const Arg *arg)
